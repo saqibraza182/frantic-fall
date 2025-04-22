@@ -1,87 +1,53 @@
 <!DOCTYPE html>
 <html lang="en-us">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity Web Player | Freeky Fall  Ball game</title>
-    <link rel="shortcut icon" href="TemplateData/favicon.ico">
-    <link rel="stylesheet" href="TemplateData/style.css">
-
-<style>
-  html, body {
-      margin: 0;
-      width: 100%;
-      height: 100%;
-      background: #000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">  <!-- :contentReference[oaicite:5]{index=5} -->
+  <title>Unity WebGL | Frenzy Fall</title>
+  <link rel="stylesheet" href="TemplateData/style.css">
+  <style>
+    html, body {
+      margin: 0; width:100%; height:100%; overflow:hidden; background:#000;
     }
-    #unity-container {
-      width: 600px;
-      height: 960px;
+    #unity-container { width:100vw; height:100vh; display:flex; justify-content:center; align-items:center; }  <!-- :contentReference[oaicite:6]{index=6} -->
+    #unity-canvas { width:100%; height:100%; display:block; }
+  </style>
+</head>
+<body>
+  <div id="unity-container">
+    <canvas id="unity-canvas" tabindex="-1"></canvas>
+    <div id="unity-loading-bar"><div id="unity-progress-bar-empty"><div id="unity-progress-bar-full"></div></div></div>
+  </div>
+  <script>
+    var canvas = document.getElementById("unity-canvas");
+    var config = {
+      dataUrl:   "Build/Build.data",
+      frameworkUrl:"Build/Build.framework.js",
+      codeUrl:   "Build/Build.wasm",
+      streamingAssetsUrl:"StreamingAssets",
+      companyName: JSON.stringify("MyCompany"),
+      productName: JSON.stringify("MyGame"),
+      productVersion: JSON.stringify("1.0"),
+      showBanner: unityShowBanner,
+      matchWebGLToCanvasSize: false,
+    };
+
+    // Force viewport fill on mobile
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      const c = document.getElementById('unity-container');
+      c.style.width  = '100vw';
+      c.style.height = '100vh';
+      // config.devicePixelRatio = 1; 
     }
-    #unity-container.unity-mobile {
-      width: 100% !important;
-      height: 100% !important;
-      margin: 0;
-    }
-    #unity-canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-</style>
 
-  </head>
-  <body>
-    <div id="unity-container" class="unity-desktop">
-      <canvas id="unity-canvas" width="600" height="960"></canvas>
-      <div id="unity-loading-bar">
-        <div id="unity-logo"></div>
-        <div id="unity-progress-bar-empty">
-          <div id="unity-progress-bar-full"></div>
-        </div>
-      </div>
-      <div id="unity-warning"> </div>
-      <div id="unity-footer">
-        <div id="unity-logo-title-footer"></div>
-        <div id="unity-fullscreen-button"></div>
-        <div id="unity-build-title">Freeky Fall  Ball game</div>
-      </div>
-    </div>
-    <script>
-      var canvas = document.querySelector("#unity-canvas");
-
-      function unityShowBanner(msg, type) { /* ... unchanged ... */ }
-
-      var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/Build.loader.js";
-      var config = { /* ... unchanged ... */ };
-
-      config.matchWebGLToCanvasSize = false;
-
-      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-          // Mobile fullscreen setup
-          var meta = document.createElement('meta');
-          meta.name = 'viewport';
-          meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-          document.head.appendChild(meta);
-          document.querySelector("#unity-container").className = "unity-mobile";
-          canvas.className = "unity-mobile";
-          config.devicePixelRatio = 1; // Optional for performance
-      } else {
-          // Desktop setup
-          canvas.style.width = "540px";
-          canvas.style.height = "960px";
-      }
-
-
-      // Loading and initialization logic (unchanged)
-      var script = document.createElement("script");
-      script.src = loaderUrl;
-      script.onload = () => { /* ... unchanged ... */ };
-      document.body.appendChild(script);
-    </script>
-  </body>
+    createUnityInstance(canvas, config, (progress) => {
+      document.getElementById("unity-progress-bar-full").style.width = 100 * progress + "%";
+    })
+    .then((unityInstance) => {
+      document.querySelector("#unity-loading-bar").style.display = "none";
+      unityInstance.SetFullscreen(1);  // 
+    })
+    .catch((message) => { alert(message); });
+  </script>
+</body>
 </html>
